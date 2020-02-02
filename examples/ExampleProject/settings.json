@@ -1,0 +1,4 @@
+{
+    "connectionString": "Server=localhost;Port=5432;Password={0};User id=postgres;Pooling=true;MinPoolSize=0;Timeout=20",
+    "password": "mysecretpassword"
+}
