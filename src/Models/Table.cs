@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace DapperHelpers.src.Models {
+namespace DapperHelpers.Models {
 	/// <summary>
 	/// An object describes a table in a database.
 	/// This main class is used for convenient access to table columns in the database by column names.
