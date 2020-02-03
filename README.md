@@ -34,15 +34,18 @@
 Адрес Nuget пакета
 https://www.nuget.org/packages/DapperHelpers
 
-Наиболее простой способ начать использовтаь DapperHelpers устанвоить его через Nuget
+Наиболее простой способ начать использовтаь DapperHelpers устанвоить его через Nuget.
+
 Просто введите следующую команду в консоли диспетчера пакетов в Visual Studio:
+
 
 ```
 PM> Install-Package DapperHelpers
-
 ```
 
+
 ### Примеры
+
 
 В следующих примерах будет использоваться class User, определенный как:
 
@@ -92,6 +95,7 @@ namespace ExampleProject {
 	}
 }
 ```
+
 
 ## Простая операция вставки
 
