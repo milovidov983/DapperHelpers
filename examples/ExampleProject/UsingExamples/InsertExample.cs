@@ -8,19 +8,6 @@ using System.Threading.Tasks;
 
 namespace ExampleProject {
 	public class InsertExample : Context {
-		private readonly User[] exampleUsers = new[] {
-			new User {
-				Name = "Bob",
-				Email = "bob@example.com",
-				RegisteredAt = DateTime.UtcNow
-			},
-			new User {
-				Name = "Alisa",
-				Email = "alisa@example.com",
-				RegisteredAt = DateTime.UtcNow
-			}
-		};
-
 
 		public override async Task ExecuteImpl(Database database) {
 			Console.WriteLine("InsertExample. Result SQL:");
@@ -28,16 +15,25 @@ namespace ExampleProject {
 			var sql = database.UsersTable
 				.Exclude(f=>f.Id)
 				.Query(x => $@"
-	insert into {x.Name} 
-	({x.SelectInsert()})
-	values
-	({x.Insert()})
+								insert into {x.Name} 
+								({x.SelectInsert()})
+								values
+								({x.Insert()})
+								returning {x.FieldShort(f=>f.Id)}
 							"
 			);
 
 			Console.WriteLine(sql);
 
-			await database.ActiveConnection.ExecuteAsync(sql, exampleUsers);
+			var user = new User {
+				Name = "Bob",
+				Email = "bob@example.com",
+				RegisteredAt = DateTime.UtcNow
+			};
+
+			var id = await database.ActiveConnection.QuerySingleAsync<int>(sql, user);
+
+			Console.WriteLine($"User inserted with id: {id}");
 
 			Console.WriteLine("InsertExample complete");
 		}

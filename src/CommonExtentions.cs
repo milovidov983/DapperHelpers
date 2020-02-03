@@ -10,7 +10,7 @@ namespace DapperHelpers {
 		}
 
 		public static string GetProperty<T, P>(this Expression<Func<T, P>> exp) {
-			MemberExpression body = (MemberExpression)exp.Body;
+			var body = (MemberExpression)exp.Body;
 			return body?.Member?.Name;
 		}
 	}

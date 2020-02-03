@@ -3,9 +3,7 @@ using DapperHelpers.Models;
 using ExampleProject.Models;
 using Npgsql;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace ExampleProject {
 	public class Database : IDisposable {

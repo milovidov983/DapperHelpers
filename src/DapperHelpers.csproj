@@ -1,14 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Description>A set of extensions for the dapper simplifies the creation of requests</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Extension set for dapper simplifies query creation</Description>
     <Copyright>Milovidov Vasiliy</Copyright>
+    <Authors>Milovidov Vasiliy</Authors>
+    <RepositoryUrl>https://github.com/milovidov983/DapperHelpers</RepositoryUrl>
+    <PackageTags>Dapper extentions sql</PackageTags>
+    <PackageIcon>file-formats.png</PackageIcon>
+    <PackageIconUrl />
+    <PackageProjectUrl>https://github.com/milovidov983/DapperHelpers</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="C:\Users\Root\Downloads\file-formats.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
