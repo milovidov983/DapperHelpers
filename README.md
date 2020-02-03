@@ -131,6 +131,7 @@ var id = await database.ActiveConnection.QuerySingleAsync<int>(sql, user);
 tnx.Commit();
 
 ```
+
 **Сгенерированный SQL**
 
 ```sql
@@ -163,3 +164,13 @@ var sql = database.UsersTable
 );
 await database.ActiveConnection.ExecuteAsync(sql, newUser);
 ```
+
+**Сгенерированный SQL**
+
+```sql
+update "Users"
+set "Id"=@Id,"Name"=@Name,"Email"=@Email
+where "Users"."Id" = @Id
+```
+
+
