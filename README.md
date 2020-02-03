@@ -76,6 +76,7 @@ namespace ExampleProject {
 ```csharp
 namespace ExampleProject {
     using DapperHelpers;
+    using DapperHelpers.Models;
     using Npgsql;
     using System;
     using System.Data;
