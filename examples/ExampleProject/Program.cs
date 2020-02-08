@@ -31,8 +31,6 @@ namespace ExampleProject {
 			var JsonbUpdateCommand = new Jsonb.UpdateExample();
 			await JsonbUpdateCommand.Execute();
 
-			await JsonbSlectCommand.Execute();
-
 			Console.WriteLine("Application completed successfully");
 		}
 	}

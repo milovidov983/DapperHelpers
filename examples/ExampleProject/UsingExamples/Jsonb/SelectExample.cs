@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using DapperHelpers.Extentions;
 
 namespace ExampleProject.Jsonb {
 	public class SelectExample : Context {
@@ -16,11 +17,12 @@ namespace ExampleProject.Jsonb {
 				.Query(x => $@"
 								select {x.Select()} 
 								from {x.Name}
+								where {x.Field(f => f.Data).JsonbStr(p=>p.Name)} = @{nameof(UserData.Name)}
 							"
 			);
 			Console.WriteLine(sql);
-
-			var resultUser = await database.ActiveConnection.QueryAsync<UserJsonb>(sql);
+			var parameters = new { Name = "Bob" };
+			var resultUser = await database.ActiveConnection.QueryFirstOrDefaultAsync<UserJsonb>(sql, parameters);
 
 			Console.WriteLine("Users selected from the database:");
 			Console.WriteLine(JsonConvert.SerializeObject(resultUser));

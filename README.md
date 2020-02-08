@@ -47,7 +47,7 @@ PM> Install-Package DapperHelpers
 ### Примеры
 
 
-В следующих примерах будет использоваться class User, определенный как:
+В первых примерах будет использоваться class User, определенный как:
 
 ```csharp
 namespace ExampleProject {
@@ -97,7 +97,7 @@ namespace ExampleProject {
 ```
 
 
-## Простая операция вставки
+#### Простая операция вставки
 
 ```csharp
 // Шаг 1. Используем класс который мы определили выше
@@ -147,7 +147,7 @@ returning "Id"
 ```
 
 
-## Простая операция обновления
+#### Простая операция обновления
 
 *Шаги 1-3 и 7 опущены для простоты*
 
@@ -178,3 +178,154 @@ where "Users"."Id" = @Id
 ```
 
 
+### Работа с jsonb в PostgreSQL
+
+Библиотека позволяет удобно работать с **jsonb** форматом базы данных PostgreSQL.
+
+Давайте для начала определим объект который у нас будет храниться в базе как jsonb, возьмем класс `UserJsonb` в нем будет только два поля(и для базы соответвенно две колонки, с типами int и jsonb) 
+```csharp
+
+/// Класс представляющий нашу таблицу в базе данных
+/// мы хотим что бы поле Data хранилось как есть в базе и и мело тим jsonb
+public class UserJsonb {
+    public const string TableName = "Users";
+
+    public int Id { get; set; }
+    public UserData Data { get; set; }
+}
+
+/// Определим тип вложенного объекта, это и будет наш jsonb
+public class UserData {
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public DateTime RegisteredAt { get; set; }
+}
+
+```
+
+
+Далее слегка модифицируем класс `Database` из бредыдущего примера таким образом:
+
+
+```csharp
+using DapperHelpers;
+using DapperHelpers.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using Npgsql;
+using System;
+using System.Data;
+public class Database : IDisposable {
+
+    public readonly Table<UserJsonb> UsersJsonbTable = TableExtentions.Create<UserJsonb>(UserJsonb.TableName);
+
+    static Database() {
+        /// Определим параметры сериализации наших объектов
+        /// вы можете их изменить по своему усмотрению, 
+        /// они нужны для сериализации/десиарилихации объектов хранящихся в бахе с типом jsonb
+        var JSS = new JsonSerializerSettings {
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+        JSS.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        JSS.Converters.Add(new StringEnumConverter() {
+            NamingStrategy = new CamelCaseNamingStrategy()
+        });
+
+        /// Здесь мы объясняем Dapper'у, как работать с нашими объектами, которые мы хотим хранить jsonb.
+        /// Так что нужно делать с каждым объектом самого высокого уровня, который мы хотим сохранить в формате jsonb.
+        /// В нашем случае объектом самого высокого урованя 
+        /// в нашей таблице будет колонка Data и ее тип в нашем приложении UserData
+        JsonTypeHandler.AddType<UserData>(mutator, JSS);
+        JsonbExtentions.SetPropertyNameConverter(PropertyNameConverters.CamelCase);
+
+        /// Специфичный для postgres обработчик для обработчика пользовательских типов Dapper
+        static void mutator(IDbDataParameter p, object v) {
+            (p as NpgsqlParameter).NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Jsonb;
+        }
+    }
+
+    public Database() {
+        ActiveConnection = GetConnection();
+    }
+
+    public IDbConnection ActiveConnection { get; private set; }
+
+    public IDbConnection GetConnection() {
+        return new NpgsqlConnection(Settings.Instance.GetConnectionString());
+    }
+
+    public void Dispose() {
+        ActiveConnection?.Dispose();
+    }
+}
+```
+
+
+#### Простая операция вставки
+
+
+```csharp
+// Шаг 1. Используем класс который мы определили выше
+using var db = new Database();
+
+// Шаг 2. Открываем содение к базе
+db.ActiveConnection.Open();
+
+// Шаг 3. Создаем транзакцию
+using var tnx = db.ActiveConnection.BeginTransaction();
+
+// Шаг 4. Создаем объект для вставки
+var user = new UserJsonb {
+    Data = new UserData {
+        Name = "Bob",
+        Email = "bob@example.com",
+        RegisteredAt = DateTime.UtcNow
+    }
+};
+
+// Шаг 5. Внешне запрос не отличается от запроса где мы не использовали jsonb
+var sql = database.UsersJsonbTable
+    .Exclude(f => f.Id)
+    .Query(x => $@"
+                    insert into {x.Name} 
+                    ({x.SelectInsert()})
+                    values
+                    ({x.Insert()})
+                    returning {x.FieldShort(f => f.Id)}
+                "
+);
+
+// Шаг 6. Выполняем запрос
+var id = await database.ActiveConnection.QuerySingleAsync<int>(sql, user);
+
+// Шаг 7. закрывем транзакцию
+tnx.Commit();
+
+```
+
+#### Операция выборки с условным полем в столбце с jsonb
+
+Используем функцию JsonbStr что бы обратится к полю Name. 
+
+```csharp
+var sql = database.UsersJsonbTable
+    .Query(x => $@"
+                    select {x.Select()} 
+                    from {x.Name}
+                    where {x.Field(f => f.Data).JsonbStr(p=>p.Name)} = @{nameof(UserData.Name)}
+                "
+);
+
+
+var parameters = new { Name = "Bob" };
+
+var resultUser = await database.ActiveConnection.QueryFirstOrDefaultAsync<UserJsonb>(sql, parameters);
+
+```
+
+В случае если бы Name находилось в еще большей вложенности то можно было бы написать так:
+```csharp
+{x.Field(f => f.Data),Jsonb(n => p.NestedObject).JsonbStr(p=>p.Name)} ...
+```

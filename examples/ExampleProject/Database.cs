@@ -1,6 +1,10 @@
 ﻿using DapperHelpers;
+using DapperHelpers.Extentions;
 using DapperHelpers.Models;
 using ExampleProject.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Npgsql;
 using System;
 using System.Data;
@@ -11,6 +15,16 @@ namespace ExampleProject {
 		public readonly Table<UserJsonb> UsersJsonbTable = TableExtentions.Create<UserJsonb>(UserJsonb.TableName);
 
 		static Database() {
+			/// Определим параметры сериализации наших объектов
+			var JSS = new JsonSerializerSettings {
+				NullValueHandling = NullValueHandling.Ignore,
+				ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+			};
+			JSS.ContractResolver = new CamelCasePropertyNamesContractResolver();
+			JSS.Converters.Add(new StringEnumConverter() {
+				NamingStrategy = new CamelCaseNamingStrategy()
+			});
+
 			/// Here we explain to Dapper how to deal 
 			/// with our objects that we want to store jsonb.
 			/// 
@@ -18,6 +32,7 @@ namespace ExampleProject {
 			/// of the highest level that we want to store in jsonb format.
 			JsonTypeHandler.AddType<UserData>(mutator, Settings.JSS);
 
+			JsonbExtentions.SetPropertyNameConverter(PropertyNameConverters.CamelCase);
 
 			/// A postgres-specific handler for Dapper custom type handler
 			static void mutator(IDbDataParameter p, object v) {
