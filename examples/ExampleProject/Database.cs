@@ -15,16 +15,6 @@ namespace ExampleProject {
 		public readonly Table<UserJsonb> UsersJsonbTable = TableExtentions.Create<UserJsonb>(UserJsonb.TableName);
 
 		static Database() {
-			/// Определим параметры сериализации наших объектов
-			var JSS = new JsonSerializerSettings {
-				NullValueHandling = NullValueHandling.Ignore,
-				ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-			};
-			JSS.ContractResolver = new CamelCasePropertyNamesContractResolver();
-			JSS.Converters.Add(new StringEnumConverter() {
-				NamingStrategy = new CamelCaseNamingStrategy()
-			});
-
 			/// Here we explain to Dapper how to deal 
 			/// with our objects that we want to store jsonb.
 			/// 
