@@ -2,8 +2,6 @@
 using DapperHelpers;
 using ExampleProject.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ExampleProject {
@@ -18,11 +16,11 @@ namespace ExampleProject {
 			Console.WriteLine("UpdateExample. Result SQL:");
 
 			var sql = database.UsersTable
-				.Exclude(f=>f.RegisteredAt)
+				.Exclude(f => f.RegisteredAt)
 				.Query(x => $@"
 	update {x.Name} 
 	set {x.Update()}
-	where {x.Field(f=>f.Id)} = @{nameof(User.Id)}
+	where {x.Field(f => f.Id)} = @{nameof(User.Id)}
 							"
 			);
 

@@ -1,6 +1,7 @@
 ﻿DROP DATABASE IF EXISTS example_db;
 
 DROP TABLE IF EXISTS "Users";
+DROP TABLE IF EXISTS "UsersJsonb";
 
 CREATE DATABASE example_db;
 
@@ -12,7 +13,8 @@ CREATE TABLE "Users"
 	"RegisteredAt" timestamp not null
 );
 
-
-ALTER TABLE "Users"
-	add constraint """Users""_pk"
-		primary key("Id");
+CREATE TABLE "UsersJsonb"
+(
+	"Id" serial not null,
+	"Data" jsonb
+);

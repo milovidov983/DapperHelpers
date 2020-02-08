@@ -24,7 +24,7 @@ namespace DapperHelpers.Models {
 		/// <summary>
 		/// Table name
 		/// </summary>
-		public string Name { get => $"\"{name}\"";}
+		public string Name { get => $"\"{name}\""; }
 
 		/// <summary>
 		/// Create table

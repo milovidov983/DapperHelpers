@@ -2,8 +2,6 @@
 using DapperHelpers;
 using ExampleProject.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ExampleProject {
@@ -13,13 +11,13 @@ namespace ExampleProject {
 			Console.WriteLine("InsertExample. Result SQL:");
 
 			var sql = database.UsersTable
-				.Exclude(f=>f.Id)
+				.Exclude(f => f.Id)
 				.Query(x => $@"
 								insert into {x.Name} 
 								({x.SelectInsert()})
 								values
 								({x.Insert()})
-								returning {x.FieldShort(f=>f.Id)}
+								returning {x.FieldShort(f => f.Id)}
 							"
 			);
 

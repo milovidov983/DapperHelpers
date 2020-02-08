@@ -19,6 +19,19 @@ namespace ExampleProject {
 			await selectCommand.Execute();
 
 
+			Console.WriteLine("--- Work with Jsonb ---");
+
+
+			var JsonbInsertCommand = new Jsonb.InsertExample();
+			await JsonbInsertCommand.Execute();
+
+			var JsonbSlectCommand = new Jsonb.SelectExample();
+			await JsonbSlectCommand.Execute();
+
+			var JsonbUpdateCommand = new Jsonb.UpdateExample();
+			await JsonbUpdateCommand.Execute();
+
+			await JsonbSlectCommand.Execute();
 
 			Console.WriteLine("Application completed successfully");
 		}

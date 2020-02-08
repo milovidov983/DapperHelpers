@@ -53,7 +53,7 @@ namespace TableUnitExtentionsTests {
 
 			var expected = typeof(Users).GetProperties()
 				.Select(prop => prop.Name)
-				.Where(x=>x != nameof(Users.Email))
+				.Where(x => x != nameof(Users.Email))
 				.OrderBy(x => x)
 				.ToArray();
 
